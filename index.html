@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+    </script>
+    <script>
+        
+        var pokeBook = {}
+        var sprite = "", idnumString = "", name = "", type = "", numOfSlots = 0, click = 0, height, weight
+        var getVal = "", getName, getSprite, getType, getID, getHeight, getWeight, arr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+        
+        
+        $(document).ready(function(){
+            //make obj store 3 points of information for every pokemon loaded to the screen.
+            for(var i = 1; i <= 151; i++){
+                $.get("https://pokeapi.co/api/v2/pokemon/" + i + "/", function(res){
+                    sprite = res.sprites.front_default
+                    idnumString = (res.id).toString()
+                    height = res.height.toString()
+                    weight = res.weight.toString()
+                    console.log(idnumString)
+                    numOfSlots = res.types[0].slot
+                    if(numOfSlots == 1){
+                        type = res.types[0].type.name + " "
+                    }
+                    else{
+                        for(var i = 0; i < numOfSlots; i++){
+                            if(numOfSlots == i + 1){
+                                type += "and " + res.types[i].type.name
+                            }
+                            else{
+                                type += res.types[i].type.name + " "
+                            }
+                        }
+                    }
+                    name = res.name
+                    pokeBook["pid" + idnumString] = {
+                        "name": name,
+                        "type": type,
+                        "sprite": sprite,
+                        "id": idnumString,
+                        "height": height,
+                        "weight": weight
+                        }
+                    
+                    $('#pokemon_main').append("<img src='" + sprite + "' class='pokemon_img' alt='Picture of Pokemon " + idnumString +  "'>")
+                }, "json")//END of $.get method
+                console.log(pokeBook)
+            }//END of forloop
+            
+            $(document).on("click", ".pokemon_img", function(){
+                var len = this.alt 
+                getVal = "pid"
+                for(var i = 0; i < len.length; i++){
+                    if(arr.includes(len[i])){
+                        getVal += len[i]
+                    }
+                }
+                getName = pokeBook[getVal].name.toUpperCase()
+                getType = pokeBook[getVal].type.toUpperCase()
+                getSprite = pokeBook[getVal].sprite
+                getID = pokeBook[getVal].id
+                getHeight = pokeBook[getVal].height
+                getWeight = pokeBook[getVal].weight
+                //retreived all values from our pokeBook.
+                if(click = 0){
+                    $("#screen").append("<h6>ID No. " + getID + " - height: " + getHeight + " - weight: " + getWeight +
+                    "</h6> <img src='" + getSprite + 
+                    "' class='pokemon_imgc' alt='picture of a pokemon'> <h4>" + getName + 
+                    "</h4> <p> A " + getType + " TYPE POKEMON")
+                    click++
+                }
+                else{
+                    $("#screen").html("<h6>ID No. " + getID + " - height: " + getHeight + " - weight: " + getWeight +
+                    "</h6> <img src='" + getSprite + 
+                    "' class='pokemon_imgc' alt='picture of a pokemon'> <h4>" + getName + 
+                    "</h4> <p> A " + getType + " TYPE POKEMON")
+                }
+            })
+
+        })//END of $(document).ready
+    </script>
+    <title>My Pokedex</title>
+</head>
+<body>
+    <div id="wrapper">
+        
+        <div id="pokemon_main">
+
+        </div>
+        
+        <div id="pokedex_side">
+            
+            <img src="pics/Gpokedex.png" id="dex"
+            alt="The famouse red pokedex from Gen 1">
+            
+            <div id="screen">
+
+            </div>
+        
+        </div>
+    </div>
+</body>
+</html>
